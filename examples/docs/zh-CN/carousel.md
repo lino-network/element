@@ -121,7 +121,7 @@
 ```html
 <template>
   <el-carousel :interval="4000" type="card" height="200px">
-    <el-carousel-item v-for="item in 6" :key="item">
+    <el-carousel-item v-for="item in 6" :key="item" :card-width="300">
       <h3 class="medium">{{ item }}</h3>
     </el-carousel-item>
   </el-carousel>

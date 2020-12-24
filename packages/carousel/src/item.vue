@@ -23,6 +23,8 @@
 <script>
   import { autoprefixer } from 'element-ui/src/utils/util';
   const CARD_SCALE = 0.83;
+  const CARD_SCALE_END = 0.73;
+  const BORDER_SCALE = 0.33;
   export default {
     name: 'ElCarouselItem',
 
@@ -31,6 +33,10 @@
       label: {
         type: [String, Number],
         default: ''
+      },
+      cardWidth: {
+        type: [String, Number],
+        default: '400'
       }
     },
 
@@ -61,13 +67,24 @@
       },
 
       calcCardTranslate(index, activeIndex) {
-        const parentWidth = this.$parent.$el.offsetWidth;
+        const p = this.$parent.$el.offsetWidth;
+        const a = (p - this.cardWidth) / 2;
+        const b = a * BORDER_SCALE;
+        const c = p - b - this.cardWidth;
+        const d = b - (1 - BORDER_SCALE) * a * 0.5;
+        const e = c + (1 - BORDER_SCALE) * a * 0.5;
         if (this.inStage) {
-          return parentWidth * ((2 - CARD_SCALE) * (index - activeIndex) + 1) / 4;
+          if (index === activeIndex - 1) {
+            return b;
+          } else if (index === activeIndex) {
+            return a;
+          } else if (index === activeIndex + 1) {
+            return c;
+          }
         } else if (index < activeIndex) {
-          return -(1 + CARD_SCALE) * parentWidth / 4;
+          return d;
         } else {
-          return (3 + CARD_SCALE) * parentWidth / 4;
+          return e;
         }
       },
 
@@ -93,7 +110,7 @@
           this.inStage = Math.round(Math.abs(index - activeIndex)) <= 1;
           this.active = index === activeIndex;
           this.translate = this.calcCardTranslate(index, activeIndex);
-          this.scale = this.active ? 1 : CARD_SCALE;
+          this.scale = this.active ? 1 : this.inStage ? CARD_SCALE : CARD_SCALE_END;
         } else {
           this.active = index === activeIndex;
           const isVertical = parentDirection === 'vertical';
@@ -118,9 +135,10 @@
 
       itemStyle() {
         const translateType = this.parentDirection === 'vertical' ? 'translateY' : 'translateX';
-        const value = `${translateType}(${ this.translate }px) scale(${ this.scale })`;
+        const value = `${translateType}(${ this.translate }px) scale(${ this.scale })`; // this.inStage ? this.scale : 0.83
         const style = {
-          transform: value
+          transform: value,
+          width: this.cardWidth ? `${ this.cardWidth }px` : 'auto'
         };
         return autoprefixer(style);
       }

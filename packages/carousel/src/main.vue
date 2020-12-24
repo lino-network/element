@@ -73,7 +73,7 @@ export default {
     },
     autoplay: {
       type: Boolean,
-      default: true
+      default: false
     },
     interval: {
       type: Number,
